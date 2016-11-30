@@ -25,6 +25,7 @@ import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import org.junit.Test;
 
 /**
  * Scans directory with jar files.
@@ -34,19 +35,31 @@ import java.util.Map;
  */
 public class JarScanner {
     private String[] args;
-    public JarScanner(String[] args) {
-        this.args = args;
+
+
+
+    public String getPackagePathOfTargetClass(String jarfile, String classname) {
+        try {
+            List<String> classes = findClassesInJar(jarfile);
+            LOG.info(" --> " + jarfile + " (" + classes.size() + ")");
+
+            for (String aclass : classes) {
+                if (aclass.contains("/" + classname + ".class")){
+                    return aclass.replaceAll(classname + ".class", "").replace("/", ".");
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "";
+        }
+
+        return "";
     }
 
-    public static void main(String[] args) throws Exception {
-        if (args.length < 3) {
-            LOG.info("Scan jars.");
-            LOG.info("Usage: java -jar jarscanner-1.0 scan jar_directory output.xml");
-            return;
-        }
-        if (args[0].trim().equalsIgnoreCase("scan")) {
-            new JarScanner(args).scan();
-        }
+    @Test
+    public void test() {
+       String result =  new JarScanner().getPackagePathOfTargetClass("C:\\Program Files\\Java\\jdk1.8.0_111\\lib\\dt.jar", "BeanInfoUtils");
+       System.out.println(result);
     }
 
     public void scan() throws Exception {
